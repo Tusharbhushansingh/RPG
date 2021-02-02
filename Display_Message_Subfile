@@ -1,0 +1,32 @@
+     A*%%TS  SD  20210129  091618  TUSHAR      REL-V7R2M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      CA03(03)
+      * Subfile Record format
+     A          R SFLRFMT                   SFL
+     A                                      SFLMSGRCD(24)
+     A            SFLKEY                    SFLMSGKEY
+     A            SFLPGMQ                   SFLPGMQ
+     A
+      * Subfile Control record format
+     A          R SFLCTLRFMT                SFLCTL(SFLRFMT)
+     A                                      SFLSIZ(4)
+     A                                      SFLPAG(1)
+     A                                      OVERLAY
+     A                                      SFLDSP
+     A                                      SFLDSPCTL
+     A                                      SFLINZ
+     A N03                                  SFLEND
+     A            SFLPGMQ                   SFLPGMQ
+     A* Header Record format on Display file
+     A          R HEADER
+     A*%%TS  SD  20210129  091618  TUSHAR      REL-V7R2M0  5770-WDS
+     A                                      OVERLAY
+     A                                  5  2'Enter Name:'
+     A            NAME          10   B  5 14
+      * Footer Record format
+     A          R FOOTER
+     A                                      OVERLAY
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+
