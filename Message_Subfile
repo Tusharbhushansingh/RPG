@@ -1,0 +1,126 @@
+     F* File Specification
+     FDIS_MESS  cf   e             workstn
+
+`
+     D* API QMHRMVPM (Remove program message from the program queue)
+     D QMHRMVPM        PR                  ExtPgm('QMHRMVPM')
+     D CallStackEntry...
+     D                               10A   Const
+     D CallStackCounter...
+     D                               10I 0 Const
+     D MessageKey...
+     D                                4A   Const
+     D MessageToRemove...
+     D                               10A   Const
+     D ErrorCode...
+     D                            32767A   Options(*VARSIZE)
+
+     D* API QMHSNDPM (Send program message to the program queue)
+     D QMHSNDPM        PR                  Extpgm('QMHSNDPM')
+     D MessageIdentifier...
+     D                                7A   Const
+     D QualifiedMessageFileName...
+     D                               20A   Const
+     D MessageDataOrImmediateText...
+     D                            32767A   Const Options(*VARSIZE)
+     D LengthofMessageDataOrImmediateText...
+     D                               10I 0 Const
+     D MessageType...
+     D                               10A   Const
+     D CallStackEntry...
+     D                               10A   Const
+     D CallStackCounter...
+     D                               10I 0 Const
+     D MessageKey...
+     D                                4A
+     D ErrorCode...
+     D                            32767A   Const Options(*VARSIZE)
+
+
+     D* Variable declaration
+     D CallStackEntry...
+     D                 S             10A
+     D CallStackCounter...
+     D                 S             10I 0
+     D MessageKey...
+     D                 S              4A
+     D MessageToRemove...
+     D                 S             10A
+     D MessageIdentifier...
+     D                 S              7A
+     D QualifiedMessageFileName...
+     D                 S             20A
+     D MessageDataOrImmediateText...
+     D                 S          32767A
+     D LengthofMessageDataOrImmediateText...
+     D                 S             10I 0
+     D MessageType...
+     D                 S             10A
+
+     D ErrorCode       DS
+     D BytesProv                     10I 0 inz(0)
+     D ButesAvail                    10I 0 inz(0)
+
+      /Free
+        //Write Footer record format
+        Write Footer;
+
+        //Write Message subfile control record format
+        Write SflCtlRFmt;
+
+        //Write Header record format
+        Exfmt Header;
+
+        //If F3 is pressed;
+        If *In03 = *On;
+          *inlr = *On;
+        EndIf;
+
+
+        // Validations subroutine
+        ExSr Validate;
+
+        //------------------------------------
+        // Subroutine : INZSR
+        //------------------------------------
+        BegSr *INZSR;
+
+        SFLPGMQ = '*' ; //Use Program's Message Queue
+        MessageType = '*DIAG' ; //Message type must be DIAGNOSTIC
+        QualifiedMessageFileName = 'TXKUMAR   TUSHAR';  //SetUp file and Lib
+        MessageToRemove = '*ALL' ; //Remove all the message from the pgm que
+
+        EndSr;
+
+        //-------------------------------------
+        // Validate Subroutine
+        //-------------------------------------
+        BegSr Validate;
+          MessageDataOrImmediateText = 'Error Message' ;
+          LengthofMessageDataOrImmediateText = %LEN(%TRIMR(
+                                               MessageDataOrImmediateText));
+
+          // Clear the message subfile
+          MessageKey = *Blanks;
+          Callp(E) QMHRMVPM(SFLPGMQ:
+                            CallStackCounter:
+                            MessageKey:
+                            MEssageToRemove:
+                            ErrorCode) ;
+
+          // Validate the name
+          If Name = *Blanks;
+            MessageIdentifier = 'MSD0001';
+            Callp(E) QMHSNDPM(MessageIdentifier:
+                              QualifiedMessageFileName:
+                              MessageDataOrImmediateText:
+                              LengthofMessageDataOrImmediateText:
+                              MessageType:
+                              SFLPGMQ:
+                              CallStackCounter:
+                              MessageKey:
+                              ErrorCode) ;
+          Endif;
+        EndSr;
+      /End-Free
+
